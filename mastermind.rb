@@ -1,30 +1,96 @@
 class Player
+    attr_reader :name
+    attr_accessor :type
+
   def initialize(name)
     @name = name
+    @type = nil
   end
+
+
+
+end
+
+class Computer
+    attr_reader :name
+    def initialize
+        @name = 'Computer'
+        @guesses = []
+    end
+
+    def guess
+        'AAA'
+    end
 end
 
 class Game
-  CODE_POSSIBILITIES = %w[A B C D E F]
+  CODE_POSSIBILITIES = %w[A B C]
 
   def initialize
     puts 'What is your name?'
     name = gets.chomp
     @player1 = Player.new(name)
-    @code = CODE_POSSIBILITIES.sample(3)
-    @guess_counts = 100
+    if code_guesser_or_creator == 'creator'
+        @player2 = Computer.new
+    end
+    @guess_counts = 5
+  end
+
+  def code_guesser_or_creator
+    puts "#{@player1.name}, would you like to guess the code or create the code?"
+    puts "Select 1 to guess the code, or 2 to create the code"
+    input = gets.chomp.to_i
+
+    if input == 1
+        @code = CODE_POSSIBILITIES.sample(3)
+        @player1.type = 'guesser'
+        "creator"
+    else
+        get_code
+        @player1.type = 'creator'
+        "guessor"
+    end
+  end
+
+  def get_code
+    puts 'Enter the code without spaces'
+    code = gets.chomp
+    if code_format_correct?(code)
+        code
+      else
+        puts 'Not Correct Format.  Try again'
+          get_code
+      end
+      @code = code
+      code
   end
 
   def get_guess
-    puts 'Enter your guess without spaces'
-    answer = gets.chomp
-    if answer_format_correct?(answer)
-      answer
+    if @player1.type == 'guesser'
+        puts 'Enter your guess without spaces'
+        answer = gets.chomp
+        if answer_format_correct?(answer)
+        answer
+        else
+        puts 'Not Correct Format.  Try again'
+            get_guess
+        end
+        answer
     else
-      puts 'Not Correct Format.  Try again'
-        get_guess
+        @player2.guess
     end
-    answer
+  end
+
+  def code_format_correct?(code)
+    return false if code.length != 3
+    return false if code.split("").uniq.length != 3
+    code_array = code.split("")
+    unless (code_array - CODE_POSSIBILITIES).empty?
+        puts 'enter the proper parameters'
+          return false
+      end
+      true
+
   end
 
   def answer_format_correct?(answer)
@@ -49,13 +115,18 @@ class Game
       returned_array.push('+') if answer_array[i] == @code[i]
     end
 
+
+
     stars = 0
-    @code.each_with_index do |_val, i|
-      stars += 1 if @code.count(answer_array[i]) > 0
+    answer_array.uniq.each do |ele|
+        if @code.include?(ele)
+            stars += 1
+        end
     end
 
+
     stars -= returned_array.count
-    stars.times { |_x| returned_array.push('*') }
+    stars.times { |x| returned_array.push('*') }
     puts returned_array.join
     returned_array.join
   end
