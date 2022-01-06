@@ -1,3 +1,1 @@
-Next Actions:
-
-- The computer is not guessing correctly
+This is for the odin project: https://www.theodinproject.com/paths/full-stack-ruby-on-rails/courses/ruby-programming/lessons/mastermind#introduction
